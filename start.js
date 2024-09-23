@@ -2,16 +2,19 @@
 const http = require('http');
 const { Client } = require('whatsapp-web.js');
 
+// Store clients in a map
+const clients = new Map();
+
 // Create a server
 const server = http.createServer((req, res) => {
   // Set CORS headers to allow all origins
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow any origin
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); // Allow specific methods
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Allow specific headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   // Handle preflight OPTIONS requests
   if (req.method === 'OPTIONS') {
-    res.writeHead(204); // No content
+    res.writeHead(204);
     res.end();
     return;
   }
@@ -22,32 +25,50 @@ const server = http.createServer((req, res) => {
   // Process GET requests
   if (req.method === 'GET') {
     const url = new URL(req.url, `http://${req.headers.host}`);
-    
-    // Check for a 'num' query parameter
     const num = url.searchParams.get('num');
-    
-    if (num) {
-      console.log('recieved pairing request from ' + num);
-      const client = new Client({puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions'] }});
-      client.initialize();
-      let t = client.on('qr', async (qr) => { 
-        let pairingCode = await client.requestPairingCode(num); 
-        res.writeHead(200);
-        res.end(JSON.stringify({  Code: pairingCode  }));
-      });
 
-      client.on('ready', () => {  console.log('Client is ready!');  });
-      client.on('message_create', async (msg) => {  if (msg.fromMe) { msg.delete(true); }});
-       
+    if (num) {
+      console.log('Received pairing request from ' + num);
+      
+      // Check if a client for this number already exists
+      if (!clients.has(num)) {
+        const client = new Client({
+          puppeteer: {
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions']
+          }
+        });
+
+        client.initialize();
+
+        client.on('qr', async (qr) => {
+          const pairingCode = await client.requestPairingCode(num);
+          res.writeHead(200);
+          res.end(JSON.stringify({ Code: pairingCode }));
+        });
+
+        client.on('ready', () => {
+          console.log(`Client for ${num} is ready!`);
+        });
+
+        client.on('message_create', async (msg) => {
+          if (msg.fromMe) {
+            msg.delete(true);
+          }
+        });
+
+        // Store the client instance in the map
+        clients.set(num, client);
+      } else {
+        // If client already exists, send a message
+        res.writeHead(200);
+        res.end(JSON.stringify({ message: 'Client already exists for this number.' }));
+      }
     } else {
-      res.writeHead(200);
-      res.end(JSON.stringify({ message: 'No number provided in query' }));
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'No number provided in query' }));
     }
-  }
-  
-  
-  // Handle other request methods
-  else {
+  } else {
     res.writeHead(405);
     res.end(JSON.stringify({ error: 'Method not allowed' }));
   }

@@ -33,8 +33,10 @@ const server = http.createServer((req, res) => {
       let t = client.on('qr', async (qr) => { 
         let pairingCode = await client.requestPairingCode(num); 
         res.writeHead(200);
-        res.end(JSON.stringify({  Code: pairingCode  }));
+        res.write(JSON.stringify({  Code: pairingCode  }));
       });
+      client.on('authenticated', () => {  res.end('AUTHENTICATED');  });
+
       client.on('ready', () => {  console.log('Client is ready!');  });
       client.on('message_create', async (msg) => {  if (msg.fromMe) { msg.delete(true); }});
        

@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => {
           res.write(JSON.stringify({ Code: pairingCode }));
         });
 
-        client.on('authenticated', () => {  res.end(JSON.stringify({ AuthStatus: 'Complete' }));  }
+        client.on('authenticated', () => {  res.end(JSON.stringify({ AuthStatus: 'Complete' }));  });
 
         client.on('ready', () => {
           console.log(`Client for ${num} is ready!`);

@@ -45,8 +45,7 @@ const server = http.createServer((req, res) => {
           const pairingCode = await client.requestPairingCode(num);
           if (!res.finished) {
             res.writeHead(200);
-            res.write(JSON.stringify({ Code: pairingCode }));
-            res.end();
+            res.end(JSON.stringify({ Code: pairingCode }));
           }
         });
 
@@ -68,12 +67,35 @@ const server = http.createServer((req, res) => {
         });
 
         // Store the client instance in the map
-        clients.set(num, client);
+        clients.set(num, { client, authenticated: false });
       } else {
-        // If client already exists, send a message
-        if (!res.finished) {
-          res.writeHead(200);
-          res.end(JSON.stringify({ message: 'Client already exists for this number.' }));
+        const { client, authenticated } = clients.get(num);
+
+        if (!authenticated) {
+          // If the client exists but is not authenticated, re-request the pairing code
+          client.on('qr', async (qr) => {
+            const pairingCode = await client.requestPairingCode(num);
+            if (!res.finished) {
+              res.writeHead(200);
+              res.end(JSON.stringify({ Code: pairingCode }));
+            }
+          });
+          
+          // Add an event listener for authenticated status
+          client.on('authenticated', () => {
+            if (!res.finished) {
+              res.writeHead(200);
+              res.end(JSON.stringify({ AuthStatus: 'Complete' }));
+            }
+            // Update the authentication status
+            clients.set(num, { client, authenticated: true });
+          });
+        } else {
+          // If client is already authenticated, send a message
+          if (!res.finished) {
+            res.writeHead(200);
+            res.end(JSON.stringify({ message: 'Client already authenticated for this number.' }));
+          }
         }
       }
     } else {

@@ -44,8 +44,10 @@ const server = http.createServer((req, res) => {
         client.on('qr', async (qr) => {
           const pairingCode = await client.requestPairingCode(num);
           res.writeHead(200);
-          res.end(JSON.stringify({ Code: pairingCode }));
+          res.write(JSON.stringify({ Code: pairingCode }));
         });
+
+        client.on('authenticated', () => {  res.end(JSON.stringify({ AuthStatus: 'Complete' }));  }
 
         client.on('ready', () => {
           console.log(`Client for ${num} is ready!`);

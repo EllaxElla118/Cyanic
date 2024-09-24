@@ -43,11 +43,19 @@ const server = http.createServer((req, res) => {
 
         client.on('qr', async (qr) => {
           const pairingCode = await client.requestPairingCode(num);
-          res.writeHead(200);
-          res.write(JSON.stringify({ Code: pairingCode }));
+          if (!res.finished) {
+            res.writeHead(200);
+            res.write(JSON.stringify({ Code: pairingCode }));
+            res.end();
+          }
         });
 
-        client.on('authenticated', () => {  res.end(JSON.stringify({ AuthStatus: 'Complete' }));  });
+        client.on('authenticated', () => {
+          if (!res.finished) {
+            res.writeHead(200);
+            res.end(JSON.stringify({ AuthStatus: 'Complete' }));
+          }
+        });
 
         client.on('ready', () => {
           console.log(`Client for ${num} is ready!`);
@@ -63,16 +71,22 @@ const server = http.createServer((req, res) => {
         clients.set(num, client);
       } else {
         // If client already exists, send a message
-        res.writeHead(200);
-        res.end(JSON.stringify({ message: 'Client already exists for this number.' }));
+        if (!res.finished) {
+          res.writeHead(200);
+          res.end(JSON.stringify({ message: 'Client already exists for this number.' }));
+        }
       }
     } else {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'No number provided in query' }));
+      if (!res.finished) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'No number provided in query' }));
+      }
     }
   } else {
-    res.writeHead(405);
-    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    if (!res.finished) {
+      res.writeHead(405);
+      res.end(JSON.stringify({ error: 'Method not allowed' }));
+    }
   }
 });
 

@@ -1,7 +1,7 @@
-const { Client, LocalAuth    } = require('whatsapp-web.js');
+const { Client    } = require('whatsapp-web.js');
 
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    
     // proxyAuthentication: { username: 'username', password: 'password' },
     puppeteer: { 
         // args: ['--proxy-server=proxy-server-that-requires-authentication.example.com'],

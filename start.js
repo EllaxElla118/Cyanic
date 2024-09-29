@@ -2,9 +2,6 @@
 const http = require('http');
 const { Client } = require('whatsapp-web.js');
 
-// Store clients in a map
-const clients = new Map();
-
 // Create a server
 const server = http.createServer((req, res) => {
   // Set CORS headers to allow all origins
@@ -26,7 +23,7 @@ const server = http.createServer((req, res) => {
     const num = url.searchParams.get('num');
 
     if (num) {
-      console.log('Received pairing request from ' + num;
+      console.log('Received pairing request from ' + num);
 
         client.initialize();
 

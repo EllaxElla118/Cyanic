@@ -32,12 +32,7 @@ const server = http.createServer((req, res) => {
       
       // Check if a client for this number already exists
       if (!clients.has(num)) {
-        const client = new Client({
-          puppeteer: {
-            headless: false,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions']
-          }
-        });
+        const client = new Client();
 
         client.initialize();
 

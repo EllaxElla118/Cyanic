@@ -11,38 +11,35 @@ const server = http.createServer((req, res) => {
 
   // Set the response header to indicate JSON content type
   res.setHeader('Content-Type', 'application/json');
-  
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const num = url.searchParams.get('num');
 
-    
-      console.log('Received pairing request from ' + num);
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const num = url.searchParams.get('num');
 
-        client.initialize();
+  console.log('Received pairing request from ' + num);
 
-        client.on('qr', async (qr) => {
-          const pairingCode = await client.requestPairingCode(num);
-            res.writeHead(200);
-            res.end(JSON.stringify({ Code: pairingCode }));
-          
-        });
+  const client = new Client(); // Initialize the client here
+  client.initialize();
 
-        client.on('authenticated', () => {
-      
-            res.writeHead(200);
-            res.end(JSON.stringify({ AuthStatus: 'Complete' }));
-          
-        });
+  client.on('qr', async (qr) => {
+    const pairingCode = await client.requestPairingCode(num);
+    res.writeHead(200);
+    res.end(JSON.stringify({ Code: pairingCode }));
+  });
 
-        client.on('ready', () => {
-          console.log(`Client for ${num} is ready!`);
-        });
+  client.on('authenticated', () => {
+    res.writeHead(200);
+    res.end(JSON.stringify({ AuthStatus: 'Complete' }));
+  });
 
-        client.on('message_create', async (msg) => {
-          if (msg.fromMe) {
-            msg.delete(true);
-          }
-        });
+  client.on('ready', () => {
+    console.log(`Client for ${num} is ready!`);
+  });
+
+  client.on('message_create', async (msg) => {
+    if (msg.fromMe) {
+      msg.delete(true);
+    }
+});
 
 // Start the server and listen on port 15346
 const PORT = 15346;

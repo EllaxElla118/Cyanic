@@ -9,20 +9,13 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight OPTIONS requests
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
-    return;
-  }
-
   // Set the response header to indicate JSON content type
   res.setHeader('Content-Type', 'application/json');
   
     const url = new URL(req.url, `http://${req.headers.host}`);
     const num = url.searchParams.get('num');
 
-    if (num) {
+    
       console.log('Received pairing request from ' + num);
 
         client.initialize();
@@ -50,10 +43,6 @@ const server = http.createServer((req, res) => {
             msg.delete(true);
           }
         });
-
-        // Store the client instance in the map
-        
-};
 
 // Start the server and listen on port 15346
 const PORT = 15346;

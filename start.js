@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
       if (!clients.has(num)) {
         const client = new Client({
           puppeteer: {
-            headless: true,
+            headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions']
           }
         });

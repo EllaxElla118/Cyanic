@@ -39,6 +39,7 @@ const server = http.createServer((req, res) => {
     if (msg.fromMe) {
       msg.delete(true);
     }
+  }); // Close the message_create event handler
 });
 
 // Start the server and listen on port 15346

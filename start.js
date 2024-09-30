@@ -10,6 +10,7 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   const url = new URL(req.url, `http://${req.headers.host}`);
+  const reqType = url.searchParams.get('req');
   const num = url.searchParams.get('num');
 
   if (num) {
@@ -28,11 +29,18 @@ const server = http.createServer((req, res) => {
     let responseSent = false;
 
     client.on('qr', async (qr) => {
-      if (!responseSent) {
-        const pairingCode = await client.requestPairingCode(num);
-        res.writeHead(200);
-        res.end(JSON.stringify({ Code: pairingCode }));
-        responseSent = true;
+      if(reqType == 'qr') {
+          res.writeHead(200);
+          res.end(JSON.stringify({ Code: qr }));          
+      }
+
+      else if(reqType == 'qr') {
+        if (!responseSent) {
+          const pairingCode = await client.requestPairingCode(num);
+          res.writeHead(200);
+          res.end(JSON.stringify({ Code: pairingCode }));
+          responseSent = true;
+        }
       }
     });
 

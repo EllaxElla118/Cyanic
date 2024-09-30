@@ -3,10 +3,8 @@ FROM node:22
 
 # Install required packages for Puppeteer and WhatsApp Web
 RUN apt-get update && apt-get install -y \
-    wget \
-    ca-certificates \
-    fonts-liberation \
-    libappindicator1 \
+    gconf-service \
+    libgbm-dev \
     libasound2 \
     libatk1.0-0 \
     libc6 \
@@ -37,8 +35,13 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxss1 \
     libxtst6 \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator1 \
+    libnss3 \
     lsb-release \
     xdg-utils \
+    wget \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 

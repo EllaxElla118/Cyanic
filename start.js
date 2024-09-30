@@ -30,14 +30,14 @@ const server = http.createServer((req, res) => {
           console.log('QR requested by ' + num);
           res.writeHead(200);
           res.end(JSON.stringify({ Code: qr }));          
-      }
+      });
         // if (!responseSent) {
          // const pairingCode = await client.requestPairingCode(num);
           // res.writeHead(200);
          // res.end(JSON.stringify({ Code: pairingCode }));
          // responseSent = true;
         // }
-      }
+      
     
 
     client.on('authenticated', () => {
@@ -55,8 +55,8 @@ const server = http.createServer((req, res) => {
         }
       });
     });
+  };
 });
-
 // Start the server and listen on port 15346
 const PORT = 15346;
 server.listen(PORT, () => {

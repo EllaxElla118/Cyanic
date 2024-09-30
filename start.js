@@ -1,4 +1,3 @@
-// Import the http module
 const http = require('http');
 const { Client } = require('whatsapp-web.js');
 
@@ -18,7 +17,14 @@ const server = http.createServer((req, res) => {
   if (num) {
     console.log('Received pairing request from ' + num);
 
-    const client = new Client(); // Initialize the client here
+    // Initialize the client with headless option
+    const client = new Client({
+      puppeteer: {
+        headless: true, // Set headless mode to true
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Recommended args for Docker
+      }
+    });
+
     client.initialize();
 
     client.on('qr', async (qr) => {
@@ -40,12 +46,12 @@ const server = http.createServer((req, res) => {
       if (msg.fromMe) {
         await msg.delete(true);
       }
-    }); // Close the message_create event handler
+    });
   } else {
     res.writeHead(400);
     res.end(JSON.stringify({ error: 'No num provided' }));
   }
-}); // Close the createServer callback
+});
 
 // Start the server and listen on port 15346
 const PORT = 15346;

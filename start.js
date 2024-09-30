@@ -15,7 +15,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const num = url.searchParams.get('num');
 
-  if(num) {
+  if (num) {
     console.log('Received pairing request from ' + num);
 
     const client = new Client(); // Initialize the client here
@@ -37,11 +37,15 @@ const server = http.createServer((req, res) => {
     });
 
     client.on('message_create', async (msg) => {
-        if (msg.fromMe) {
-          msg.delete(true);
+      if (msg.fromMe) {
+        await msg.delete(true);
       }
     }); // Close the message_create event handler
-  };
+  } else {
+    res.writeHead(400);
+    res.end(JSON.stringify({ error: 'No num provided' }));
+  }
+}); // Close the createServer callback
 
 // Start the server and listen on port 15346
 const PORT = 15346;

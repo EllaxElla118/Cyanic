@@ -11,7 +11,7 @@ const server = http.createServer((req, res) => {
 
   const url = new URL(req.url, `http://${req.headers.host}`);
   const reqType = url.searchParams.get('req');
-  const num = url.searchParams.get('num');
+  const num = url.searchParams.get('from');
 
   if (num) {
     console.log('Received pairing request from ' + num);

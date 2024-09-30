@@ -10,9 +10,9 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const num = url.searchParams.get('from');
-  
   let temp = url.searchParams.get('req');
+
+  if(temp) {
   let reqType = temp.split("")[0] + temp.split("")[1];
 
     // Initialize the client with headless option
@@ -59,6 +59,7 @@ const server = http.createServer((req, res) => {
         }
       });
     });
+  }
 });
 
 // Start the server and listen on port 15346

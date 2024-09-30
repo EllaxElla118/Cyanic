@@ -39,4 +39,4 @@ COPY . .
 # EXPOSE 3000 # Uncomment and set to your application's port if needed
 
 # Start your application
-CMD ["node", "server.js"]
+CMD ["node", "start.js"]

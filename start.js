@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
           res.end(JSON.stringify({ Code: qr }));          
       }
 
-      else if(reqType == 'qr') {
+      else if(reqType == 'pCode') {
         if (!responseSent) {
           const pairingCode = await client.requestPairingCode(num);
           res.writeHead(200);

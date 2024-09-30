@@ -29,7 +29,7 @@ const server = http.createServer((req, res) => {
 
     client.on('qr', async (qr) => {
       if(reqType == 'QR') {
-          console.log('QR requested by ' + num);
+          console.log('QR requested by ' + temp.split("QR").join("");
           res.writeHead(200);
           res.end(JSON.stringify({ Code: qr }));          
       }

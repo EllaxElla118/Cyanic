@@ -7,8 +7,6 @@ const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  // Set the response header to indicate JSON content type
   res.setHeader('Content-Type', 'application/json');
 
   const url = new URL(req.url, `http://${req.headers.host}`);
@@ -27,15 +25,23 @@ const server = http.createServer((req, res) => {
 
     client.initialize();
 
+    let responseSent = false; // Track if a response has been sent
+
     client.on('qr', async (qr) => {
-      const pairingCode = await client.requestPairingCode(num);
-      res.writeHead(200);
-      res.end(JSON.stringify({ Code: pairingCode }));
+      if (!responseSent) {
+        const pairingCode = await client.requestPairingCode(num);
+        res.writeHead(200);
+        res.end(JSON.stringify({ Code: pairingCode }));
+        responseSent = true; // Mark response as sent
+      }
     });
 
     client.on('authenticated', () => {
-      res.writeHead(200);
-      res.end(JSON.stringify({ AuthStatus: 'Complete' }));
+      if (!responseSent) {
+        res.writeHead(200);
+        res.end(JSON.stringify({ AuthStatus: 'Complete' }));
+        responseSent = true; // Mark response as sent
+      }
     });
 
     client.on('ready', () => {

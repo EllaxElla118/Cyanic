@@ -18,40 +18,38 @@ const server = http.createServer((req, res) => {
     // Initialize the client with headless option
     const client = new Client({
       puppeteer: {
-        headless: true, // Set headless mode to true
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] // Recommended args for Docker
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
       }
     });
 
     client.initialize();
 
-    let responseSent = false; // Track if a response has been sent
+    let responseSent = false;
 
     client.on('qr', async (qr) => {
       if (!responseSent) {
         const pairingCode = await client.requestPairingCode(num);
         res.writeHead(200);
         res.end(JSON.stringify({ Code: pairingCode }));
-        responseSent = true; // Mark response as sent
+        responseSent = true;
       }
     });
 
     client.on('authenticated', () => {
-      if (!responseSent) {
-        res.writeHead(200);
-        res.end(JSON.stringify({ AuthStatus: 'Complete' }));
-        responseSent = true; // Mark response as sent
-      }
+      console.log('Client authenticated successfully');
     });
 
     client.on('ready', () => {
       console.log(`Client for ${num} is ready!`);
-    });
 
-    client.on('message_create', async (msg) => {
-      if (msg.fromMe) {
-        await msg.delete(true);
-      }
+      // Move the message_create handler here
+      client.on('message_create', async (msg) => {
+        console.log('Message received:', msg.body);
+        if (msg.fromMe) {
+          await msg.delete(true);
+        }
+      });
     });
   } else {
     res.writeHead(400);

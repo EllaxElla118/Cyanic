@@ -10,10 +10,9 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   const url = new URL(req.url, `http://${req.headers.host}`);
-  let temp = url.searchParams.get('req');
+  let num = url.searchParams.get('req');
 
-  if(temp) {
-  let reqType = temp.split("")[0] + temp.split("")[1];
+  if(num) {
 
     // Initialize the client with headless option
     const client = new Client({
@@ -28,21 +27,18 @@ const server = http.createServer((req, res) => {
     let responseSent = false;
 
     client.on('qr', async (qr) => {
-      if(reqType == 'QR') {
-          console.log('QR requested by ' + temp.split("QR").join(""));
+          console.log('QR requested by ' + num);
           res.writeHead(200);
           res.end(JSON.stringify({ Code: qr }));          
       }
-
-      else if(reqType == 'PC') {
-        if (!responseSent) {
-          const pairingCode = await client.requestPairingCode(num);
-          res.writeHead(200);
-          res.end(JSON.stringify({ Code: pairingCode }));
-          responseSent = true;
-        }
+        // if (!responseSent) {
+         // const pairingCode = await client.requestPairingCode(num);
+          // res.writeHead(200);
+         // res.end(JSON.stringify({ Code: pairingCode }));
+         // responseSent = true;
+        // }
       }
-    });
+    
 
     client.on('authenticated', () => {
       console.log('Client authenticated successfully');
@@ -59,7 +55,6 @@ const server = http.createServer((req, res) => {
         }
       });
     });
-  }
 });
 
 // Start the server and listen on port 15346

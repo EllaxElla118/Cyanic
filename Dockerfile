@@ -2,6 +2,7 @@
 FROM node:22
 
 # Install required packages for Puppeteer and WhatsApp Web
+RUN npm i https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7
 RUN apt-get update && apt-get install -y \
     gconf-service \
     libgbm-dev \

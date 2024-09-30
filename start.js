@@ -14,7 +14,6 @@ const server = http.createServer((req, res) => {
   const num = url.searchParams.get('from');
 
   if (num) {
-    console.log('Received pairing request from ' + num);
 
     // Initialize the client with headless option
     const client = new Client({
@@ -30,6 +29,7 @@ const server = http.createServer((req, res) => {
 
     client.on('qr', async (qr) => {
       if(reqType == 'qr') {
+          console.log('QR requested by ' + num);
           res.writeHead(200);
           res.end(JSON.stringify({ Code: qr }));          
       }

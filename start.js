@@ -11,7 +11,8 @@ const server = http.createServer((req, res) => {
 
   const url = new URL(req.url, `http://${req.headers.host}`);
   let num = url.searchParams.get('req');
-
+  let type = url.searchParams.get('type');
+  
   if(num) {
 
     // Initialize the client with headless option
@@ -32,6 +33,7 @@ const server = http.createServer((req, res) => {
     let responseSent = false;
 
     client.on('qr', async (qr) => {
+      console.log(type);
           console.log('QR requested by ' + num);
           res.writeHead(200);
           res.write(JSON.stringify({ Code: qr }));          

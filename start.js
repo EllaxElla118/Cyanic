@@ -33,10 +33,13 @@ const server = http.createServer((req, res) => {
     let responseSent = false;
 
     client.on('qr', async (qr) => {
+      if(!responseSent) {
       console.log(type);
           console.log('QR requested by ' + num);
           res.writeHead(200);
-          res.write(JSON.stringify({ Code: qr }));          
+          res.write(JSON.stringify({ Code: qr }));   
+          responseSent = true;
+      }
       });
         // if (!responseSent) {
          // const pairingCode = await client.requestPairingCode(num);

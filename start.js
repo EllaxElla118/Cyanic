@@ -16,6 +16,11 @@ const server = http.createServer((req, res) => {
 
     // Initialize the client with headless option
     const client = new Client({
+      webVersionCache: 
+  {
+    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2402.5-beta.html',
+    type: 'remote' 
+  },
       puppeteer: {
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']

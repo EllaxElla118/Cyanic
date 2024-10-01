@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
     client.on('qr', async (qr) => {
           console.log('QR requested by ' + num);
           res.writeHead(200);
-          res.end(JSON.stringify({ Code: qr }));          
+          res.write(JSON.stringify({ Code: qr }));          
       });
         // if (!responseSent) {
          // const pairingCode = await client.requestPairingCode(num);
@@ -46,6 +46,7 @@ const server = http.createServer((req, res) => {
     
 
     client.on('authenticated', () => {
+      res.end(JSON.stringify({ Code: "Authenticated" }));
       console.log('Client authenticated successfully');
     });
 

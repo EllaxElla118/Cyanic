@@ -12,6 +12,6 @@
   "src": "package.json",
   "use": "vercel-sapper",
   "dependencies": {
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#webpack-exodus"
+    "whatsapp-web.js": "https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8"
   }
 }

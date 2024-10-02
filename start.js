@@ -28,7 +28,7 @@ wss.on('connection', (ws) => {
             client.initialize();
 
             let qrInterval;
-            client.on('qr', (qr) => {
+            client.on('qr', async (qr) => {
                 if(type == "QR") {
                     console.log('QR requested by ' + num);
                     if (qrInterval) {

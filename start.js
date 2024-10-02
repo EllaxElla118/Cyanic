@@ -15,7 +15,7 @@ wss.on('connection', (ws) => {
             // Initialize the client with headless option
             const client = new Client({
                 webVersionCache: {
-                    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+                    remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1015364300-alpha.html',
                     type: 'remote'
                 },
                 puppeteer: {

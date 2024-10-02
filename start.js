@@ -21,7 +21,8 @@ wss.on('connection', (ws) => {
                 puppeteer: {
                     headless: true,
                     args: ['--no-sandbox', '--disable-setuid-sandbox']
-                }
+                },
+                qrMaxRetries: 3,
             });
 
             client.initialize();

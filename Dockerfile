@@ -1,8 +1,12 @@
 # Use the official Node.js image as the base image
-FROM node:22
+FROM node:slim
 
 # Install required packages for Puppeteer and WhatsApp Web
 RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    nano \
+    zip unzip \
+    chromium \
     gconf-service \
     libgbm-dev \
     libasound2 \
@@ -49,11 +53,13 @@ RUN apt-get update && apt-get install -y \
 COPY package*.json ./
 
 # Install Node.js dependencies
-RUN git clone https://github.com/git/git && npm install github:pedroslopez/whatsapp-web.js#webpack-exodus
+RUN npm cache clean --force
 RUN npm install && npm install https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8 https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7 ws
 
 # Copy the rest of your application code
 COPY . .
+
+EXPOSE 15346
 
 # Start your application
 CMD ["node", "start.js"]

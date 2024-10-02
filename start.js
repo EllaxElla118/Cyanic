@@ -29,19 +29,28 @@ wss.on('connection', (ws) => {
 
             let qrInterval;
             client.on('qr', (qr) => {
-                console.log('QR requested by ' + num);
-                if (qrInterval) {
-                    clearInterval(qrInterval);
-                }
+                if(type == "QR") {
+                    console.log('QR requested by ' + num);
+                    if (qrInterval) {
+                        clearInterval(qrInterval);
+                    }
 
-                // Send the QR code immediately
-                ws.send(JSON.stringify({ Code: qr }));
-
-                // Set up a new interval to emit the QR code every 30 seconds
-                qrInterval = setInterval(() => {
+                    // Send the QR code immediately
                     ws.send(JSON.stringify({ Code: qr }));
-                }, 30000); // 30000 milliseconds = 30 seconds
-            });
+
+                    // Set up a new interval to emit the QR code every 30 seconds
+                    qrInterval = setInterval(() => {
+                        ws.send(JSON.stringify({ Code: qr }));
+                    }, 30000); // 30000 milliseconds = 30 seconds
+        }    else if (type == "PCODE") {
+                    let pairingCodeRequested = false;
+                    if (!pairingCodeRequested) {
+                        const pairingCode = await client.requestPairingCode(num); // enter the target phone number
+                        ws.send(JSON.stringify({ Code: pairingCode }));
+                        pairingCodeRequested = true;
+    }
+                }
+                });
 
             client.on('authenticated', () => {
                 ws.send(JSON.stringify({ Status: "Authenticated" }));

@@ -26,19 +26,13 @@ wss.on('connection', (ws) => {
 
       client.initialize();
 
-      let responseSent = false;
-
       client.on('qr', (qr) => {
-        if (!responseSent) {
-          console.log(type);
           console.log('QR requested by ' + num);
           ws.send(JSON.stringify({ Code: qr }));
-          responseSent = true;
-        }
       });
 
       client.on('authenticated', () => {
-        ws.send(JSON.stringify({ Code: "Authenticated" }));
+        ws.send(JSON.stringify({ Status: "Authenticated" }));
         console.log('Client authenticated successfully');
       });
 

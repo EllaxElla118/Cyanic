@@ -26,9 +26,21 @@ wss.on('connection', (ws) => {
 
       client.initialize();
 
+      let qrInterval;
       client.on('qr', (qr) => {
           console.log('QR requested by ' + num);
-          ws.send(JSON.stringify({ Code: qr }));
+        if (qrInterval) {
+        clearInterval(qrInterval);
+    }
+
+    // Send the QR code immediately
+    ws.send(JSON.stringify({ Code: qr }));
+
+    // Set up a new interval to emit the QR code every 30 seconds
+    qrInterval = setInterval(() => {
+        ws.send(JSON.stringify({ Code: qr }));
+    }, 30000); // 30000 milliseconds = 30 seconds
+});
       });
 
       client.on('authenticated', () => {

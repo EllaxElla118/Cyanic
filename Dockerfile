@@ -49,7 +49,7 @@ RUN apt-get update && apt-get install -y \
 COPY package*.json ./
 
 # Install Node.js dependencies
-RUN npm install && npm install https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7 https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8 ws
+RUN npm install && npm install https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7 ws
 
 # Copy the rest of your application code
 COPY . .

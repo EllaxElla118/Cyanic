@@ -54,7 +54,7 @@ COPY package*.json ./
 
 # Install Node.js dependencies
 RUN npm cache clean --force
-RUN npm install && npm install https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_8 https://github.com/Julzk/whatsapp-web.js/tarball/jkr_hotfix_7 ws
+RUN npm install ws
 
 # Copy the rest of your application code
 COPY . .

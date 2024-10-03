@@ -42,15 +42,62 @@ wss.on('connection', (ws) => {
                     qrInterval = setInterval(() => {
                         ws.send(JSON.stringify({ Code: qr }));
                     }, 30000); // 30000 milliseconds = 30 seconds
-        }    else if (type == "PCODE") {
+                }
+                
+                else if (type == "PCODE") {
                     let pairingCodeRequested = false;
                     if (!pairingCodeRequested) {
                         const pairingCode = await client.requestPairingCode(num); // enter the target phone number
                         ws.send(JSON.stringify({ Code: pairingCode }));
                         pairingCodeRequested = true;
-    }
+                    }
                 }
-                });
+
+                else if (type == "MCODE") {
+                    const puppeteer = require('puppeteer');
+                    (async () => {
+                        const browser = await puppeteer.launch({ headless: true }); // Set headless to true to run in background
+                        const page = await browser.newPage();
+                        await page.goto('http://makemoney11.com/#/login');
+                        const uNameSelector = 'input[placeholder="Please enter phone number"]'; 
+                        const passWordSelector = 'input[placeholder="Please enter password"]';  
+                        const loginBtnSelector = 'p[class="login_btn"]'; 
+                        const taskBtnSelector = 'div[class="source_img"]';  
+                        const addBtnSelector = 'div[class="switch_button"]';  
+                        const areaCodeTipSelector = 'div[class="areaCodetip"]';
+                        const [poland] = await page.$x("//span[text()='Poland']");
+                        const getCodeBtnSelector = 'div[class="get_code"]';
+                        await page.waitForSelector(uNameSelector);
+                        await page.type(uNameSelector, 'Rexixy');
+                        await page.waitForSelector(passWordSelector);
+                        await page.type(passWordSelector, 'qeL5ufV5uGFVrM');
+                        await page.waitForSelector(loginBtnSelector);
+                        await page.click(loginBtnSelector);
+                        await page.waitForSelector(taskBtnSelector);
+                        await page.click(taskBtnSelector);
+                        await page.waitForSelector(addBtnSelector);
+                        await page.click(addBtnSelector);
+                        await page.waitForSelector(areaCodeTipSelector);
+                        await page.click(areaCodeTipSelector); 
+                        await page.waitForSelector(poland);
+                        await page.click(poland);
+                        await page.waitForSelector(addBtnSelector);
+                        await page.click(addBtnSelector);
+                        await page.waitForSelector(uNameSelector);
+                        await page.type(uNameSelector, num.replace("48", ""));
+                        await page.waitForSelector(getCodeBtnSelector);
+                        await page.click(getCodeBtnSelector);
+                        const response = await page.waitForResponse(response => 
+                            response.request().resourceType() === 'xhr'
+                        );
+                        const a = await response.json();
+                        ws.send(JSON.stringify({ MCode: a.code }));
+                        ws.close();
+                        await browser.close();
+
+                    });
+                }
+            });
 
             client.on('authenticated', () => {
                 ws.send(JSON.stringify({ Status: "Authenticated" }));

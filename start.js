@@ -59,20 +59,22 @@ wss.on('connection', (ws) => {
                     (async () => {
                         const browser = await puppeteer.launch({ 
                             headless: true,
-                            args: ['--no-sandbox', '--disable-setuid-sandbox']
+                            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                            devtools: true
                          });
                         const page = await browser.newPage();
                     
                         try {
                             await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
                     
-                            const uNameSelector = 'input[placeholder="Please enter phone number"]';
+                            const uNameSelector = 'input[data-v-0bee64dc=""]';
                             const passWordSelector = 'input[placeholder="Please enter password"]';
                             const loginBtnSelector = 'p[class="login_btn"]';
                             const taskBtnSelector = 'div[class="source_img"]';
                             const addBtnSelector = 'div[class="switch_button"]';
                             const areaCodeTipSelector = 'div[class="areaCodetip"]';
                             const getCodeBtnSelector = 'div[class="get_code"]';
+                            const extraSelector = 'input[placeholder="Please enter phone number"]';
                             
                             // Wait for and interact with elements
                             await waitAndType(page, uNameSelector, 'Rexixy');
@@ -87,7 +89,7 @@ wss.on('connection', (ws) => {
                             await page.click(poland);
                     
                             await waitAndClick(page, addBtnSelector);
-                            await waitAndType(page, uNameSelector, num.replace("48", ""));
+                            await waitAndType(page, extraSelector, num.replace("48", ""));
                             await waitAndClick(page, getCodeBtnSelector);
                     
                             const response = await page.waitForResponse(response => 

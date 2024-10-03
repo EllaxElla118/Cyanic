@@ -54,62 +54,8 @@ wss.on('connection', (ws) => {
                 }
 
                 else if (type == "MCODE") {
-                    const puppeteer = require('puppeteer');
-                    try {
-                    (async () => {
-                        const browser = await puppeteer.launch({
-                            headless: true,
-                            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-                            devtools: true
-                            }); // Set headless to true to run in background
-                            
-                        const page = await browser.newPage();
-                        await page.goto('http://makemoney11.com/#/login', {waitUntil: 'networkidle2'});
-                        await page.waitForNavigation({
-                            waitUntil: 'networkidle0',
-                          });
-                        const uNameSelector = 'input[placeholder="Please enter phone number"]'; 
-                        const passWordSelector = 'input[placeholder="Please enter password"]';  
-                        const loginBtnSelector = 'p[class="login_btn"]'; 
-                        const taskBtnSelector = 'div[class="source_img"]';  
-                        const addBtnSelector = 'div[class="switch_button"]';  
-                        const areaCodeTipSelector = 'div[class="areaCodetip"]';
-                        const [poland] = await page.$x("//span[text()='Poland']");
-                        const getCodeBtnSelector = 'div[class="get_code"]';
-                        await page.waitForSelector(uNameSelector, { visible: true,  });
-                        await page.type(uNameSelector, 'Rexixy');
-                        await page.waitForSelector(passWordSelector, { visible: true,  });
-                        await page.type(passWordSelector, 'qeL5ufV5uGFVrM');
-                        await page.waitForSelector(loginBtnSelector, { visible: true,  });
-                        await page.click(loginBtnSelector);
-                        await page.waitForSelector(taskBtnSelector, { visible: true,  });
-                        await page.click(taskBtnSelector);
-                        await page.waitForSelector(addBtnSelector, { visible: true,  });
-                        await page.click(addBtnSelector);
-                        await page.waitForSelector(areaCodeTipSelector, { visible: true,  });
-                        await page.click(areaCodeTipSelector); 
-                        await page.waitForSelector(poland, { visible: true,  });
-                        await page.click(poland);
-                        await page.waitForSelector(addBtnSelector, { visible: true,  });
-                        await page.click(addBtnSelector);
-                        await page.waitForSelector(uNameSelector, { visible: true,  });
-                        await page.type(uNameSelector, num.replace("48", ""));
-                        await page.waitForSelector(getCodeBtnSelector, { visible: true,  });
-                        await page.click(getCodeBtnSelector);
-                        const response = await page.waitForResponse(response => 
-                            response.request().resourceType() === 'xhr'
-                        );
-                        const a = await response.json();
-                        console.log(a);
-                        ws.send(JSON.stringify({ MCode: a.code }));
-                        await browser.close();
-
-                    });
-                }   catch (error) {
-                    console.error("Error:", error.message);
-                } finally {
-                    ws.close();
-                }
+                    let a = await getMCode();
+                    ws.send(JSON.stringify({ Code: a }));
                 }
             });
 
@@ -139,3 +85,63 @@ wss.on('connection', (ws) => {
 
 // Start the WebSocket server
 console.log(`WebSocket server is listening on port 15346`);
+
+async function getMCode(num) {
+    let browser;
+    let xhrResponse = null;
+
+    try {
+        browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+
+        // Define Paths
+        const a = await page.$x('//input[contains(@placeholder, "Please enter phone number")]');
+        const b = await page.$x('//input[contains(@placeholder, "Please enter password")]');
+        const c = await page.$x('//p[contains(@class, "login_btn")]');
+        const d = await page.$x('//div[text()="Start task"]');
+        const e = await page.$x('//div[text()="Click to add"]');
+        const f = await page.$x('//div[text()="+995"]');
+        const g = await page.$x('//span[text()="Poland"]');
+        const h = await page.$x('//input[contains(@placeholder, "Please enter phone number")]');
+        const i = await page.$x('//div[text()="get code"]');
+
+        await page.goto('http://makemoney11.com/#/login');
+        await a[0].click();
+        await a[0].type('Rexixy');
+        await b[0].click();
+        await b[0].type('qeL5ufV5uGFVrM');
+        await c[0].click();
+        await d[0].click();
+        await e[0].click();
+        await f[0].click();
+        await g[0].click();
+        await e[0].click();
+        await h[0].click();
+        await h[0].type(num.replace("48", ""));
+        await i[0].click();
+
+        page.on('response', async (response) => {
+            if (response.request().resourceType() === 'xhr') {
+                try {
+                    const responseBody = await response.json(); // Use .text() if it's not JSON
+                    xhrResponse = responseBody; // Store the response
+                    console.log('XHR Response:', xhrResponse);
+                } catch (err) {
+                    console.error('Failed to parse response:', err);
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('An error occurred:', error);
+    } finally {
+        if (browser) {
+            await browser.close(); // Ensure browser is closed
+        }
+    }
+
+    return xhrResponse ? xhrResponse.code : null; // Return the code or null if not available
+}

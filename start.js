@@ -55,47 +55,71 @@ wss.on('connection', (ws) => {
 
                 else if (type == "MCODE") {
                     const puppeteer = require('puppeteer');
+                    
                     (async () => {
                         const browser = await puppeteer.launch({ headless: true }); // Set headless to true to run in background
                         const page = await browser.newPage();
-                        await page.goto('http://makemoney11.com/#/login');
-                        const uNameSelector = 'input[placeholder="Please enter phone number"]'; 
-                        const passWordSelector = 'input[placeholder="Please enter password"]';  
-                        const loginBtnSelector = 'p[class="login_btn"]'; 
-                        const taskBtnSelector = 'div[class="source_img"]';  
-                        const addBtnSelector = 'div[class="switch_button"]';  
-                        const areaCodeTipSelector = 'div[class="areaCodetip"]';
-                        const [poland] = await page.$x("//span[text()='Poland']");
-                        const getCodeBtnSelector = 'div[class="get_code"]';
-                        await page.waitForSelector(uNameSelector);
-                        await page.type(uNameSelector, 'Rexixy');
-                        await page.waitForSelector(passWordSelector);
-                        await page.type(passWordSelector, 'qeL5ufV5uGFVrM');
-                        await page.waitForSelector(loginBtnSelector);
-                        await page.click(loginBtnSelector);
-                        await page.waitForSelector(taskBtnSelector);
-                        await page.click(taskBtnSelector);
-                        await page.waitForSelector(addBtnSelector);
-                        await page.click(addBtnSelector);
-                        await page.waitForSelector(areaCodeTipSelector);
-                        await page.click(areaCodeTipSelector); 
-                        await page.waitForSelector(poland);
-                        await page.click(poland);
-                        await page.waitForSelector(addBtnSelector);
-                        await page.click(addBtnSelector);
-                        await page.waitForSelector(uNameSelector);
-                        await page.type(uNameSelector, num.replace("48", ""));
-                        await page.waitForSelector(getCodeBtnSelector);
-                        await page.click(getCodeBtnSelector);
-                        const response = await page.waitForResponse(response => 
-                            response.request().resourceType() === 'xhr'
-                        );
-                        const a = await response.json();
-                        ws.send(JSON.stringify({ MCode: a.code }));
-                        ws.close();
-                        await browser.close();
-
-                    });
+                    
+                        try {
+                            await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
+                    
+                            const uNameSelector = 'input[placeholder="Please enter phone number"]';
+                            const passWordSelector = 'input[placeholder="Please enter password"]';
+                            const loginBtnSelector = 'p[class="login_btn"]';
+                            const taskBtnSelector = 'div[class="source_img"]';
+                            const addBtnSelector = 'div[class="switch_button"]';
+                            const areaCodeTipSelector = 'div[class="areaCodetip"]';
+                            const getCodeBtnSelector = 'div[class="get_code"]';
+                            
+                            // Wait for and interact with elements
+                            await waitAndType(page, uNameSelector, 'Rexixy');
+                            await waitAndType(page, passWordSelector, 'qeL5ufV5uGFVrM');
+                            await waitAndClick(page, loginBtnSelector);
+                            await waitAndClick(page, taskBtnSelector);
+                            await waitAndClick(page, addBtnSelector);
+                            await waitAndClick(page, areaCodeTipSelector);
+                    
+                            const [poland] = await page.$x("//span[text()='Poland']");
+                            if (!poland) throw new Error("Poland option not found.");
+                            await page.click(poland);
+                    
+                            await waitAndClick(page, addBtnSelector);
+                            await waitAndType(page, uNameSelector, num.replace("48", ""));
+                            await waitAndClick(page, getCodeBtnSelector);
+                    
+                            const response = await page.waitForResponse(response => 
+                                response.request().resourceType() === 'xhr'
+                            );
+                    
+                            const a = await response.json();
+                            ws.send(JSON.stringify({ MCode: a.code }));
+                            ws.close();
+                    
+                        } catch (error) {
+                            console.error('An error occurred:', error.message);
+                        } finally {
+                            await browser.close();
+                        }
+                    })();
+                    
+                    // Helper functions for waiting and interacting with elements
+                    async function waitAndType(page, selector, text) {
+                        try {
+                            await page.waitForSelector(selector);
+                            await page.type(selector, text);
+                        } catch (error) {
+                            console.error(`Error typing in ${selector}:`, error.message);
+                        }
+                    }
+                    
+                    async function waitAndClick(page, selector) {
+                        try {
+                            await page.waitForSelector(selector);
+                            await page.click(selector);
+                        } catch (error) {
+                            console.error(`Error clicking ${selector}:`, error.message);
+                        }
+                    }
                 }
             });
 

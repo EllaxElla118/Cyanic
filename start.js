@@ -110,7 +110,7 @@ async function getMCode(num) {
         const h = await page.$x('//input[contains(@placeholder, "Please enter phone number")]');
         const i = await page.$x('//div[text()="get code"]');
 
-        await page.goto('http://makemoney11.com/#/login');
+        await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
         await a.click();
         await a.type('Rexixy');
         await b[0].click();

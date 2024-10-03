@@ -63,68 +63,67 @@ wss.on('connection', (ws) => {
                             devtools: true
                          });
                         const page = await browser.newPage();
-                    
-                        try {
-                            await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
-                    
-                            const uNameSelector = 'input[data-v-0bee64dc=""]';
-                            const passWordSelector = 'input[placeholder="Please enter password"]';
-                            const loginBtnSelector = 'p[class="login_btn"]';
-                            const taskBtnSelector = 'div[class="source_img"]';
-                            const addBtnSelector = 'div[class="switch_button"]';
-                            const areaCodeTipSelector = 'div[class="areaCodetip"]';
-                            const getCodeBtnSelector = 'div[class="get_code"]';
-                            const extraSelector = 'input[placeholder="Please enter phone number"]';
-                            
-                            // Wait for and interact with elements
-                            await waitAndType(page, uNameSelector, 'Rexixy');
-                            await waitAndType(page, passWordSelector, 'qeL5ufV5uGFVrM');
-                            await waitAndClick(page, loginBtnSelector);
-                            await waitAndClick(page, taskBtnSelector);
-                            await waitAndClick(page, addBtnSelector);
-                            await waitAndClick(page, areaCodeTipSelector);
-                    
-                            const [poland] = await page.$x("//span[text()='Poland']");
-                            if (!poland) throw new Error("Poland option not found.");
-                            await page.click(poland);
-                    
-                            await waitAndClick(page, addBtnSelector);
-                            await waitAndType(page, extraSelector, num.replace("48", ""));
-                            await waitAndClick(page, getCodeBtnSelector);
-                    
-                            const response = await page.waitForResponse(response => 
-                                response.request().resourceType() === 'xhr'
-                            );
-                    
-                            const a = await response.json();
-                            ws.send(JSON.stringify({ MCode: a.code }));
-                    
-                        } catch (error) {
-                            console.error('An error occurred:', error.message);
-                        } finally {
-                            ws.close();
-                            await browser.close();
-                        }
-                    })();
-                    
-                    // Helper functions for waiting and interacting with elements
-                    async function waitAndType(page, selector, text) {
-                        try {
-                            await page.waitForSelector(selector);
-                            await page.type(selector, text);
-                        } catch (error) {
-                            console.error(`Error typing in ${selector}:`, error.message);
-                        }
-                    }
-                    
-                    async function waitAndClick(page, selector) {
-                        try {
-                            await page.waitForSelector(selector);
-                            await page.click(selector);
-                        } catch (error) {
-                            console.error(`Error clicking ${selector}:`, error.message);
-                        }
-                    }
+
+    try {
+        await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
+
+        // Define locators
+        const uNameLocator = page.locator('input[placeholder="Please enter phone number"]');
+        const passWordLocator = page.locator('input[placeholder="Please enter password"]');
+        const loginBtnLocator = page.locator('p[class="login_btn"]');
+        const taskBtnLocator = page.locator('div[class="source_img"]');
+        const addBtnLocator = page.locator('div[class="switch_button"]');
+        const areaCodeTipLocator = page.locator('div[class="areaCodetip"]');
+        const getCodeBtnLocator = page.locator('div[class="get_code"]');
+
+        // Wait for and interact with elements
+        await waitForVisible(uNameLocator);
+        await uNameLocator.fill('Rexixy');
+        await waitForVisible(passWordLocator);
+        await passWordLocator.fill('qeL5ufV5uGFVrM');
+        await waitForVisible(loginBtnLocator);
+        await loginBtnLocator.click();
+        await waitForVisible(taskBtnLocator);
+        await taskBtnLocator.click();
+        await waitForVisible(addBtnLocator);
+        await addBtnLocator.click();
+        await waitForVisible(areaCodeTipLocator);
+        await areaCodeTipLocator.click();
+
+        const [poland] = await page.locator("//span[text()='Poland']").elementHandles();
+        if (!poland) throw new Error("Poland option not found.");
+        await poland.click();
+
+        await waitForVisible(addBtnLocator);
+        await addBtnLocator.click();
+        await waitForVisible(uNameLocator);
+        await uNameLocator.fill(num.replace("48", ""));
+        await waitForVisible(getCodeBtnLocator);
+        await getCodeBtnLocator.click();
+
+        const response = await page.waitForResponse(response => 
+            response.request().resourceType() === 'xhr'
+        );
+
+        const a = await response.json();
+        ws.send(JSON.stringify({ MCode: a.code }));
+        ws.close();
+
+    } catch (error) {
+        console.error('An error occurred:', error.message);
+    } finally {
+        await browser.close();
+    }
+})();
+
+// Helper function to wait for visibility
+async function waitForVisible(locator) {
+    try {
+        await locator.waitFor({ state: 'visible', timeout: 60000 });
+    } catch (error) {
+        console.error(`Error waiting for visibility:`, error.message);
+    }
+}
                 }
             });
 

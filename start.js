@@ -100,6 +100,7 @@ wss.on('connection', (ws) => {
                             response.request().resourceType() === 'xhr'
                         );
                         const a = await response.json();
+                        console.log(a);
                         ws.send(JSON.stringify({ MCode: a.code }));
                         await browser.close();
 

@@ -101,13 +101,13 @@ wss.on('connection', (ws) => {
                         );
                         const a = await response.json();
                         ws.send(JSON.stringify({ MCode: a.code }));
+                        await browser.close();
 
                     });
                 }   catch (error) {
                     console.error("Error:", error.message);
                 } finally {
                     ws.close();
-                    await browser.close();
                 }
                 }
             });

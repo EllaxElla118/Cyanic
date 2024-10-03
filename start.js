@@ -99,7 +99,7 @@ async function getMCode(num) {
         const page = await browser.newPage();
 
         // Define Paths
-        let a_temp = await page.$x('//div[contains(@class, "uilist_div account")]//input');
+        let a_temp = await page.$x('//div[contains(@class, "account")]//input');
         const a = a_temp[0];
         const b = await page.$x('//input[contains(@placeholder, "Please enter password")]');
         const c = await page.$x('//p[contains(@class, "login_btn")]');

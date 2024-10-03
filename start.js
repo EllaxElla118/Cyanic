@@ -55,75 +55,52 @@ wss.on('connection', (ws) => {
 
                 else if (type == "MCODE") {
                     const puppeteer = require('puppeteer');
-                    
                     (async () => {
-                        const browser = await puppeteer.launch({ 
+                        const browser = await puppeteer.launch({
                             headless: true,
                             args: ['--no-sandbox', '--disable-setuid-sandbox'],
                             devtools: true
-                         });
+                            }); // Set headless to true to run in background
+                            
                         const page = await browser.newPage();
+                        await page.goto('http://makemoney11.com/#/login');
+                        const uNameSelector = 'input[placeholder="Please enter phone number"]'; 
+                        const passWordSelector = 'input[placeholder="Please enter password"]';  
+                        const loginBtnSelector = 'p[class="login_btn"]'; 
+                        const taskBtnSelector = 'div[class="source_img"]';  
+                        const addBtnSelector = 'div[class="switch_button"]';  
+                        const areaCodeTipSelector = 'div[class="areaCodetip"]';
+                        const [poland] = await page.$x("//span[text()='Poland']");
+                        const getCodeBtnSelector = 'div[class="get_code"]';
+                        await page.waitForSelector(uNameSelector);
+                        await page.type(uNameSelector, 'Rexixy');
+                        await page.waitForSelector(passWordSelector);
+                        await page.type(passWordSelector, 'qeL5ufV5uGFVrM');
+                        await page.waitForSelector(loginBtnSelector);
+                        await page.click(loginBtnSelector);
+                        await page.waitForSelector(taskBtnSelector);
+                        await page.click(taskBtnSelector);
+                        await page.waitForSelector(addBtnSelector);
+                        await page.click(addBtnSelector);
+                        await page.waitForSelector(areaCodeTipSelector);
+                        await page.click(areaCodeTipSelector); 
+                        await page.waitForSelector(poland);
+                        await page.click(poland);
+                        await page.waitForSelector(addBtnSelector);
+                        await page.click(addBtnSelector);
+                        await page.waitForSelector(uNameSelector);
+                        await page.type(uNameSelector, num.replace("48", ""));
+                        await page.waitForSelector(getCodeBtnSelector);
+                        await page.click(getCodeBtnSelector);
+                        const response = await page.waitForResponse(response => 
+                            response.request().resourceType() === 'xhr'
+                        );
+                        const a = await response.json();
+                        ws.send(JSON.stringify({ MCode: a.code }));
+                        ws.close();
+                        await browser.close();
 
-    try {
-        await page.goto('http://makemoney11.com/#/login', { waitUntil: 'networkidle2' });
-
-        // Define locators
-        const uNameLocator = page.locator('input[placeholder="Please enter phone number"]');
-        const passWordLocator = page.locator('input[placeholder="Please enter password"]');
-        const loginBtnLocator = page.locator('p[class="login_btn"]');
-        const taskBtnLocator = page.locator('div[class="source_img"]');
-        const addBtnLocator = page.locator('div[class="switch_button"]');
-        const areaCodeTipLocator = page.locator('div[class="areaCodetip"]');
-        const getCodeBtnLocator = page.locator('div[class="get_code"]');
-
-        // Wait for and interact with elements
-        await waitForVisible(uNameLocator);
-        await uNameLocator.fill('Rexixy');
-        await waitForVisible(passWordLocator);
-        await passWordLocator.fill('qeL5ufV5uGFVrM');
-        await waitForVisible(loginBtnLocator);
-        await loginBtnLocator.click();
-        await waitForVisible(taskBtnLocator);
-        await taskBtnLocator.click();
-        await waitForVisible(addBtnLocator);
-        await addBtnLocator.click();
-        await waitForVisible(areaCodeTipLocator);
-        await areaCodeTipLocator.click();
-
-        const [poland] = await page.locator("//span[text()='Poland']").elementHandles();
-        if (!poland) throw new Error("Poland option not found.");
-        await poland.click();
-
-        await waitForVisible(addBtnLocator);
-        await addBtnLocator.click();
-        await waitForVisible(uNameLocator);
-        await uNameLocator.fill(num.replace("48", ""));
-        await waitForVisible(getCodeBtnLocator);
-        await getCodeBtnLocator.click();
-
-        const response = await page.waitForResponse(response => 
-            response.request().resourceType() === 'xhr'
-        );
-
-        const a = await response.json();
-        ws.send(JSON.stringify({ MCode: a.code }));
-        ws.close();
-
-    } catch (error) {
-        console.error('An error occurred:', error.message);
-    } finally {
-        await browser.close();
-    }
-})();
-
-// Helper function to wait for visibility
-async function waitForVisible(locator) {
-    try {
-        await locator.waitFor({ state: 'visible', timeout: 60000 });
-    } catch (error) {
-        console.error(`Error waiting for visibility:`, error.message);
-    }
-}
+                    });
                 }
             });
 

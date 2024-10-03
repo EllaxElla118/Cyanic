@@ -57,7 +57,10 @@ wss.on('connection', (ws) => {
                     const puppeteer = require('puppeteer');
                     
                     (async () => {
-                        const browser = await puppeteer.launch({ headless: true }); // Set headless to true to run in background
+                        const browser = await puppeteer.launch({ 
+                            headless: true,
+                            args: ['--no-sandbox', '--disable-setuid-sandbox']
+                         });
                         const page = await browser.newPage();
                     
                         try {
@@ -93,11 +96,11 @@ wss.on('connection', (ws) => {
                     
                             const a = await response.json();
                             ws.send(JSON.stringify({ MCode: a.code }));
-                            ws.close();
                     
                         } catch (error) {
                             console.error('An error occurred:', error.message);
                         } finally {
+                            ws.close();
                             await browser.close();
                         }
                     })();

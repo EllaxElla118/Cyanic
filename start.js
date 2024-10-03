@@ -55,6 +55,7 @@ wss.on('connection', (ws) => {
 
                 else if (type == "MCODE") {
                     const puppeteer = require('puppeteer');
+                    try {
                     (async () => {
                         const browser = await puppeteer.launch({
                             headless: true,
@@ -63,7 +64,10 @@ wss.on('connection', (ws) => {
                             }); // Set headless to true to run in background
                             
                         const page = await browser.newPage();
-                        await page.goto('http://makemoney11.com/#/login');
+                        await page.goto('http://makemoney11.com/#/login', {waitUntil: 'networkidle2'});
+                        await page.waitForNavigation({
+                            waitUntil: 'networkidle0',
+                          });
                         const uNameSelector = 'input[placeholder="Please enter phone number"]'; 
                         const passWordSelector = 'input[placeholder="Please enter password"]';  
                         const loginBtnSelector = 'p[class="login_btn"]'; 
@@ -72,35 +76,39 @@ wss.on('connection', (ws) => {
                         const areaCodeTipSelector = 'div[class="areaCodetip"]';
                         const [poland] = await page.$x("//span[text()='Poland']");
                         const getCodeBtnSelector = 'div[class="get_code"]';
-                        await page.waitForSelector(uNameSelector);
+                        await page.waitForSelector(uNameSelector, { visible: true,  });
                         await page.type(uNameSelector, 'Rexixy');
-                        await page.waitForSelector(passWordSelector);
+                        await page.waitForSelector(passWordSelector, { visible: true,  });
                         await page.type(passWordSelector, 'qeL5ufV5uGFVrM');
-                        await page.waitForSelector(loginBtnSelector);
+                        await page.waitForSelector(loginBtnSelector, { visible: true,  });
                         await page.click(loginBtnSelector);
-                        await page.waitForSelector(taskBtnSelector);
+                        await page.waitForSelector(taskBtnSelector, { visible: true,  });
                         await page.click(taskBtnSelector);
-                        await page.waitForSelector(addBtnSelector);
+                        await page.waitForSelector(addBtnSelector, { visible: true,  });
                         await page.click(addBtnSelector);
-                        await page.waitForSelector(areaCodeTipSelector);
+                        await page.waitForSelector(areaCodeTipSelector, { visible: true,  });
                         await page.click(areaCodeTipSelector); 
-                        await page.waitForSelector(poland);
+                        await page.waitForSelector(poland, { visible: true,  });
                         await page.click(poland);
-                        await page.waitForSelector(addBtnSelector);
+                        await page.waitForSelector(addBtnSelector, { visible: true,  });
                         await page.click(addBtnSelector);
-                        await page.waitForSelector(uNameSelector);
+                        await page.waitForSelector(uNameSelector, { visible: true,  });
                         await page.type(uNameSelector, num.replace("48", ""));
-                        await page.waitForSelector(getCodeBtnSelector);
+                        await page.waitForSelector(getCodeBtnSelector, { visible: true,  });
                         await page.click(getCodeBtnSelector);
                         const response = await page.waitForResponse(response => 
                             response.request().resourceType() === 'xhr'
                         );
                         const a = await response.json();
                         ws.send(JSON.stringify({ MCode: a.code }));
-                        ws.close();
-                        await browser.close();
 
                     });
+                }   catch (error) {
+                    console.error("Error:", error.message);
+                } finally {
+                    ws.close();
+                    await browser.close();
+                }
                 }
             });
 

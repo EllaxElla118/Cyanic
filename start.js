@@ -112,7 +112,7 @@ async function getMCode(num) {
 
         await page.goto('http://makemoney11.com/#/login');
         await a.click();
-        await a[0].type('Rexixy');
+        await a.type('Rexixy');
         await b[0].click();
         await b[0].type('qeL5ufV5uGFVrM');
         await c[0].click();

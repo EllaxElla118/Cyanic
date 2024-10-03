@@ -111,7 +111,7 @@ async function getMCode(num) {
         const i = await page.$x('//div[text()="get code"]');
 
         await page.goto('http://makemoney11.com/#/login');
-        await a[0].click();
+        await a.click();
         await a[0].type('Rexixy');
         await b[0].click();
         await b[0].type('qeL5ufV5uGFVrM');

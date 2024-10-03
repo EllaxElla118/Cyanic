@@ -87,6 +87,7 @@ wss.on('connection', (ws) => {
 console.log(`WebSocket server is listening on port 15346`);
 
 async function getMCode(num) {
+    const puppeteer = require('puppeteer');
     let browser;
     let xhrResponse = null;
 
